@@ -1,4 +1,4 @@
-from azure.identity import AzureCliCredential
+from azure.identity import AzureCliCredential, InteractiveBrowserCredential
 from azure.search.documents import SearchClient
 from azure.search.documents.indexes import SearchIndexClient
 from azure.search.documents.indexes.models import SearchIndex, SimpleField, SearchableField, SearchFieldDataType
@@ -93,7 +93,20 @@ ai_search_index_name = sys.argv[4] if len(sys.argv) > 4 else "sample-dataset-ind
 if not ai_search_endpoint.__contains__("search.windows.net"):
     ai_search_endpoint = f"https://{ai_search_endpoint}.search.windows.net"
 
-credential = AzureCliCredential()
+class ChainedDeveloperCredential:
+    def __init__(self):
+        self._credentials = [AzureCliCredential(), InteractiveBrowserCredential()]
+
+    def get_token(self, *scopes, **kwargs):
+        last_error = None
+        for credential in self._credentials:
+            try:
+                return credential.get_token(*scopes, **kwargs)
+            except Exception as exc:
+                last_error = exc
+        raise last_error
+
+credential = ChainedDeveloperCredential()
 
 try:
     blob_service_client = BlobServiceClient(account_url=f"https://{storage_account_name}.blob.core.windows.net", credential=credential)

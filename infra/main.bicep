@@ -57,7 +57,7 @@ param gpt4_1ModelVersion string = '2025-12-11'
 
 @minLength(1)
 @description('Optional. Name of the GPT Reasoning model to deploy:')
-param gptReasoningModelName string = 'o3'
+param gptReasoningModelName string = 'gpt-5.4-mini'
 
 @description('Optional. Version of the GPT Reasoning model to deploy. Defaults to 2025-04-16.')
 param gptReasoningModelVersion string = '2025-04-16'
@@ -99,7 +99,7 @@ param gptDeploymentCapacity int = 50
 param gpt4_1ModelCapacity int = 30
 
 @description('Optional. AI model deployment token capacity. Defaults to 10 for lower quota requirements during initial deployment.')
-param gptReasoningModelCapacity int = 50
+param gptReasoningModelCapacity int = 10
 
 @description('Optional. The tags to apply to all deployed Azure resources.')
 param tags resourceInput<'Microsoft.Resources/resourceGroups@2025-04-01'>.tags = {}
@@ -831,19 +831,6 @@ module existingAiFoundryAiServicesDeployments 'modules/ai-services-deployments.b
           capacity: aiFoundryAiServices4_1ModelDeployment.sku.capacity
         }
       }
-      {
-        name: aiFoundryAiServicesReasoningModelDeployment.name
-        model: {
-          format: aiFoundryAiServicesReasoningModelDeployment.format
-          name: aiFoundryAiServicesReasoningModelDeployment.name
-          version: aiFoundryAiServicesReasoningModelDeployment.version
-        }
-        raiPolicyName: aiFoundryAiServicesReasoningModelDeployment.raiPolicyName
-        sku: {
-          name: aiFoundryAiServicesReasoningModelDeployment.sku.name
-          capacity: aiFoundryAiServicesReasoningModelDeployment.sku.capacity
-        }
-      }
     ]
     roleAssignments: [
       {
@@ -904,19 +891,6 @@ module aiFoundryAiServices 'br:mcr.microsoft.com/bicep/avm/res/cognitive-service
         sku: {
           name: aiFoundryAiServices4_1ModelDeployment.sku.name
           capacity: aiFoundryAiServices4_1ModelDeployment.sku.capacity
-        }
-      }
-      {
-        name: aiFoundryAiServicesReasoningModelDeployment.name
-        model: {
-          format: aiFoundryAiServicesReasoningModelDeployment.format
-          name: aiFoundryAiServicesReasoningModelDeployment.name
-          version: aiFoundryAiServicesReasoningModelDeployment.version
-        }
-        raiPolicyName: aiFoundryAiServicesReasoningModelDeployment.raiPolicyName
-        sku: {
-          name: aiFoundryAiServicesReasoningModelDeployment.sku.name
-          capacity: aiFoundryAiServicesReasoningModelDeployment.sku.capacity
         }
       }
     ]
@@ -1394,7 +1368,7 @@ module containerApp 'br/public:avm/res/app/container-app:0.22.0' = {
           }
           {
             name: 'SUPPORTED_MODELS'
-            value: '["o3","gpt-5.2","gpt-5.4-mini"]'
+            value: '["gpt-5.2","gpt-5.4-mini"]'
           }
           {
             name: 'AZURE_STORAGE_BLOB_URL'
@@ -1890,7 +1864,7 @@ output AZURE_COGNITIVE_SERVICES string = 'https://cognitiveservices.azure.com/.d
 output REASONING_MODEL_NAME string = aiFoundryAiServicesReasoningModelDeployment.name
 output MCP_SERVER_NAME string = 'MacaeMcpServer'
 output MCP_SERVER_DESCRIPTION string = 'MCP server with greeting, HR, and planning tools'
-output SUPPORTED_MODELS string = '["o3","gpt-5.2","gpt-5.4-mini"]'
+output SUPPORTED_MODELS string = '["gpt-5.2","gpt-5.4-mini"]'
 output BACKEND_URL string = 'https://${containerApp.outputs.fqdn}'
 output AZURE_AI_PROJECT_ENDPOINT string = aiFoundryAiProjectEndpoint
 output AZURE_AI_AGENT_ENDPOINT string = aiFoundryAiProjectEndpoint

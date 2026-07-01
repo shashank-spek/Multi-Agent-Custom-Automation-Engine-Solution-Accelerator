@@ -501,7 +501,13 @@ echo "Subscription ID: $azSubscriptionId"
 echo "==============================================="
 echo ""
 
+echo "Resolving signed-in Azure user..."
 userPrincipalId=$(run_step az ad signed-in-user show --query id -o tsv)
+if [[ -z "$userPrincipalId" ]]; then
+    echo "Error: Could not resolve signed-in Azure user. Run 'az login' and retry."
+    exit 1
+fi
+echo "Signed-in Azure user resolved."
 
 # Determine the correct Python command
 pythonCmd=""
@@ -549,7 +555,10 @@ fi
 
 # Install the requirements
 echo "Installing requirements"
-pip install --quiet -r infra/scripts/requirements.txt
+if ! pip install --quiet -r infra/scripts/requirements.txt; then
+    echo "Error: Failed to install Python requirements."
+    exit 1
+fi
 echo "Requirements installed"
 
 isTeamConfigFailed=false

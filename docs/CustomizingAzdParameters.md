@@ -20,7 +20,7 @@ By default this template will use the environment name as the prefix to prevent 
 | `AZURE_ENV_MODEL_4_1_VERSION`       | string | `2025-12-11`      | Version of the GPT model to be used for deployment.                                                |
 | `AZURE_ENV_MODEL_4_1_CAPACITY`       | int | `30`      | Sets the GPT model capacity. Lower defaults reduce quota failures during initial deployment.       |
 | `AZURE_ENV_REASONING_MODEL_DEPLOYMENT_TYPE` | string | `GlobalStandard` | Defines the deployment type for the AI model (e.g., Standard, GlobalStandard).                     |
-| `AZURE_ENV_REASONING_MODEL_NAME`          | string | `o3`          | Specifies the name of the reasoning GPT model to be deployed.                                                |
+| `AZURE_ENV_REASONING_MODEL_NAME`          | string | `gpt-5.4-mini` | Specifies the name of the reasoning GPT model to be deployed.                                                |
 | `AZURE_ENV_REASONING_MODEL_VERSION`       | string | `2025-04-16`      | Version of the reasoning GPT model to be used for deployment.                                                |
 | `AZURE_ENV_REASONING_MODEL_CAPACITY`       | int | `10`      | Sets the reasoning GPT model capacity. Lower defaults reduce quota failures during initial deployment.       |
 | `AZURE_ENV_IMAGE_TAG`            | string | `latest_v4`          | Docker image tag used for container deployments.                                                   |

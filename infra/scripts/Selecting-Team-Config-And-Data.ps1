@@ -448,6 +448,7 @@ do {
 # WAF/Private Networking: If the Container App has IP restrictions or internal ingress,
 # the backendUrl is not reachable from the developer's machine. Route through the frontend
 # App Service proxy instead, which is public and forwards /api/* to the private backend over VNet.
+Write-Host "Inspecting deployed app networking configuration..."
 $solutionSuffix = az group show --name $ResourceGroup --query "tags.SolutionSuffix" -o tsv 2>$null
 if ($solutionSuffix) {
     $containerAppName = "ca-$solutionSuffix"
@@ -465,6 +466,7 @@ if ($solutionSuffix) {
         $script:backendUrl = $frontendUrl
     }
 }
+Write-Host "Networking configuration resolved."
 
 Write-Host ""
 Write-Host "==============================================="
@@ -480,8 +482,13 @@ Write-Host "Subscription ID: $azSubscriptionId"
 Write-Host "==============================================="
 Write-Host ""
 
-
+Write-Host "Resolving signed-in Azure user..."
 $userPrincipalId = $(az ad signed-in-user show --query id -o tsv)
+if (-not $userPrincipalId) {
+    Write-Host "Error: Could not resolve signed-in Azure user. Run 'az login' and retry." -ForegroundColor Red
+    exit 1
+}
+Write-Host "Signed-in Azure user resolved."
 
 # Determine the correct Python command
 $pythonCmd = $null
@@ -540,6 +547,10 @@ if ($activateScript) {
 # Install the requirements
 Write-Host "Installing requirements"
 pip install --quiet -r infra/scripts/requirements.txt
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Error: Failed to install Python requirements." -ForegroundColor Red
+    exit 1
+}
 Write-Host "Requirements installed"
 
 $isTeamConfigFailed = $false
@@ -895,6 +906,12 @@ if ($isTeamConfigFailed -or $isSampleDataFailed) {
     
 }
 
+} catch {
+    Write-Host "Unhandled script error: $($_.Exception.Message)" -ForegroundColor Red
+    if ($_.InvocationInfo -and $_.InvocationInfo.PositionMessage) {
+        Write-Host $_.InvocationInfo.PositionMessage -ForegroundColor Red
+    }
+    exit 1
 } finally {
     # Cleanup: Restore network access
     Write-Host ""
